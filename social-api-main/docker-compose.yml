@@ -1,0 +1,36 @@
+version: '3.8'
+services: 
+
+  socialapi:
+    container_name: socialapi
+    build: ./
+    command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./socialapi/app:/app/socialapi
+    ports:
+      - 5002:8000
+    depends_on:
+      - mongodb
+    restart: always
+    networks:
+      - fastapi_network
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.2.17-bionic
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - 27017:27017
+    volumes:
+      - db_volume:/data/db
+    networks:
+      - fastapi_network
+volumes:
+  db_volume:
+
+networks:
+  fastapi_network:
